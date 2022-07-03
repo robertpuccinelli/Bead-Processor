@@ -5,7 +5,7 @@ setuptools.setup(
     version="0.0.1",
     author="Robert R. Puccinelli",
     author_email="robert.puccinelli@outlook.com",
-    description="Automated magnetic bead proccessor project and utilities.",
+    description="Automated magnetic bead processor project and utilities.",
     url="https://github.com/robert.puccinelli/bead_processor.git",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*",
                                                "tests.*", "tests"]),
