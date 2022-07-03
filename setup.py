@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="beadprocesssor",
+    name="beadprocessor",
     version="0.0.1",
     author="Robert R. Puccinelli",
     author_email="robert.puccinelli@outlook.com",
