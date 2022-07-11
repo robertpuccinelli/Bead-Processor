@@ -2,7 +2,6 @@
 The purpose of this testing script is to calibrate the flow rate of a peristaltic pump and evaluate the linearity of the device over a range of flow rates. The script assumes a PC will be used with a FTDI serial device for evaluating the pump.
 '''
 
-#from importlib import resources
 from pkg_resources import Requirement, resource_filename
 from enum import Enum, auto
 from time import sleep
