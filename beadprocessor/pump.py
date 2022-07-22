@@ -2,6 +2,8 @@
 The pump controller module provides a class and utilities for controlling the flow of the bead processor.
 '''
 
+from time import sleep
+
 class Pump():
     '''Pump base class.
 
@@ -21,33 +23,33 @@ class Pump():
     '''
 
     def __init__(self, vol_per_rev, initial_flow_rate):
-        self._setVolPerRev(vol_per_rev)
+        self._vol_per_rev = vol_per_rev
         self.flow_rate = initial_flow_rate
 
     @property
     def flow_rate(self):
         '''Microliters per minute.'''
-        return self._revs_per_min * self._VOL_PER_REV
+        return self._revs_per_min * self._vol_per_rev
 
     @flow_rate.setter
     def flow_rate(self,target_flow_rate):
-        self._revs_per_min = target_flow_rate / self._VOL_PER_REV
-        self._updateFlowRate()
+        self._revs_per_min = target_flow_rate / self._vol_per_rev
+        self._updateFlowRate(self._revs_per_min)
 
     @property
     def is_running(self):
         return self._status()
 
-    def aspirate(self, volume):
-        self._pump(abs(volume))
+    def aspirate(self, volume, blocking=True):
+        self._pump(abs(volume), blocking)
 
-    def dispense(self, volume):
-        self._pump(-abs(volume))
+    def dispense(self, volume, blocking=True):
+        self._pump(-abs(volume), blocking)
 
     def stopPump(self):
         self._stop()
 
-    def _pump(self, volume):
+    def _pump(self, volume, blocking):
         raise NotImplementedError()
 
     def _setVolPerRev(self, vol_per_rev):
@@ -77,12 +79,22 @@ class PumpTic(Pump):
     def __init__(self, MotorObj, vol_per_rev, initial_flow_rate):
         self._motor = MotorObj
         self._motor.enable = True
-        super().__init__(vol_per_rev, initial_flow_rate)
+        super().__init__(vol_per_rev=vol_per_rev, initial_flow_rate=initial_flow_rate)
 
-    def _pump(self, volume):
+    def _pump(self, volume, blocking):
         self._motor.moveRelDist(volume)
+        if blocking:
+            sleep(.02)
+            while(self._motor.isMoving()==True):
+                pass
 
-    def _setVolPerRev(self, vol_per_rev):
+
+    @property
+    def _vol_per_rev(self):
+        return self._motor.dist_per_rev
+
+    @_vol_per_rev.setter
+    def _vol_per_rev(self, vol_per_rev):
         self._motor.dist_per_rev = vol_per_rev
 
     def _status(self):
@@ -92,4 +104,4 @@ class PumpTic(Pump):
         self._motor.stop()
 
     def _updateFlowRate(self, flow_rate):
-        self._motor.dist_per_min = flow_rate
+        self._motor.rpm = flow_rate

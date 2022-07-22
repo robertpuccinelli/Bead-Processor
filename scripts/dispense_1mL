@@ -1,0 +1,12 @@
+from pkg_resources import Requirement, resource_filename
+from beadprocessor import BeadProcessorHardwareSetup
+
+path_to_config = resource_filename(Requirement.parse("beadprocessor"), "config/beadprocessor.config")
+hardware = BeadProcessorHardwareSetup()
+hardware.configValidation(path_to_config)
+hardware.initializeConfig('PC')
+pump = hardware.subunits['PUMPS'][0]
+pump.flow_rate = 50*100
+# input('Press `Enter` to begin dispensing.')
+pump.dispense(700*hardware.subunits['WELLS_PER_PUMP'])
+# input('Press `Enter` to complete protocol.')

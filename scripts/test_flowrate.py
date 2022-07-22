@@ -45,6 +45,13 @@ pump.enable = True
 min_rpm = max_rpm / aliquots
 pump.rpm = min_rpm
 
+input('Pump will run until stopped. Press `Enter` to continue.')
+pump.moveRelDist(100)
+input('Press `Enter` to stop pump once air has been purged.')
+pump.stop()
+pump.moveRelDist(1)
+
+
 input('Pump will cycle through 10 revolutions to calibrate volume. Press `Enter` to continue.')
 
 pump.moveRelDist(10)

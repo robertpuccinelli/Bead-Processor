@@ -4,6 +4,7 @@ from pymotors import TicStepper
 from pyconfighandler import validateConfig
 from beadprocessor import PumpTic, UIPC
 
+
 class DefaultConfigFields(Enum):
     WELLS_NUM = auto()
     PUMP_STEPS_REV = auto()
@@ -11,6 +12,8 @@ class DefaultConfigFields(Enum):
     PUMP_CURR = auto()
     PUMP_VOL_REV = auto()
     PUMP_FLOW_RATE_WELL = auto()
+    PUMP_FLOW_RATE_DISP = auto()
+
 
 class BeadProcessorHardwareSetup():
     def __init__(self):
@@ -58,25 +61,26 @@ class BeadProcessorHardwareSetup():
         curr = int(config[config_mode]['PUMP_CURR'])
         vol_rev = int(config[config_mode]['PUMP_VOL_REV'])
         well_flow_rate = int(config[config_mode]['PUMP_FLOW_RATE_WELL'])
+        dispense_flow_rate = int(config[config_mode]['PUMP_FLOW_RATE_DISP'])
 
         wells_per_pump = num_wells / num_pumps
         flow_rate = wells_per_pump * well_flow_rate
 
         pumps = []
-
         for i in range(0, num_pumps):
-            if pump_mode is 'SERIAL':
+            if pump_mode == 'SERIAL':
                 port = config[config_mode]['PUMP_PORT']
                 baud = int(config[config_mode]['PUMP_BAUD'])
                 motor = TicStepper(com_type='Serial', port_params=[port,baud], input_steps_per_rev=steps_rev, input_rpm = 500)
+                print('Motor initialized')
             motor.microsteps = 1/micros
             motor.setCurrentLimit(curr)
             motor.enable = True
 
             pumps.append(PumpTic(motor, vol_per_rev=vol_rev, initial_flow_rate=flow_rate))
 
-        return {'PUMPS': pumps, 'PUMP_FLOW_RATE': flow_rate, 'WELLS_PER_PUMP': wells_per_pump}
-
+        print('Initialized')
+        return {'PUMPS': pumps, 'PUMP_FLOW_RATE': flow_rate, 'WELLS_PER_PUMP': wells_per_pump, 'FLOW_RATE_NORMAL':well_flow_rate,'FLOW_RATE_DISPENSE':dispense_flow_rate}
 
     @staticmethod
     def _initializeUI(config, config_mode):
